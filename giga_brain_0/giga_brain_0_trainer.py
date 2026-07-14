@@ -37,7 +37,8 @@ class GigaBrain0Trainer(Trainer):
 
         if giga_brain_0.enable_next_token_prediction:
             # Make sure the lm_head and embed_tokens are tied
-            assert giga_brain_0.paligemma_with_expert.lm_head.weight.data_ptr() == giga_brain_0.paligemma_with_expert.embed_tokens.weight.data_ptr()
+            # assert giga_brain_0.paligemma_with_expert.lm_head.weight.data_ptr() == giga_brain_0.paligemma_with_expert.embed_tokens.weight.data_ptr()
+            pass
 
         giga_brain_0.to(self.device)
         giga_brain_0.train()

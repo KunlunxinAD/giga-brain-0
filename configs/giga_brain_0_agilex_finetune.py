@@ -1,6 +1,6 @@
 action_chunk = 50
 data_paths = [
-    './lerobot_data/',
+    '/home/giga/aloha_mobile_wipe_wine',
 ]
 data_or_config = []
 for data_path in data_paths:
@@ -18,20 +18,16 @@ config = dict(
     runners=['giga_brain_0.GigaBrain0Trainer'],
     project_dir='./experiments/vla/giga_brain_0_agilex/finetune_debug',
     launch=dict(
-        gpu_ids=[0, 1, 2, 3, 4, 5, 6, 7],
-        distributed_type='FSDP',
-        fsdp_config=dict(
-            fsdp_version='2',
-            fsdp_auto_wrap_policy='TRANSFORMER_BASED_WRAP',
-            fsdp_transformer_layer_cls_to_wrap='SiglipEncoderLayer,Gemma2DecoderLayerWithExpert',
-            fsdp_cpu_ram_efficient_loading='false',
-            fsdp_state_dict_type='FULL_STATE_DICT',
+        gpu_ids=[0,1,2,3,4,5,6,7],
+        distributed_type='DEEPSPEED',
+        deepspeed_config=dict(
+            deepspeed_config_file='accelerate_configs/zero2.json',
         ),
     ),
     dataloaders=dict(
         train=dict(
             data_or_config=data_or_config,
-            batch_size_per_gpu=32,
+            batch_size_per_gpu=8,
             num_workers=16,
             transform=dict(
                 type='GigaBrain0Transform',
@@ -44,7 +40,7 @@ config = dict(
                 ),
                 norm_cfg=dict(
                     norm_stats_path={
-                        '0': './lerobot_data/meta/agilex_norm_stats.json',
+                        '0': '/home/giga/aloha_mobile_wipe_wine/norm_stats.json',
                     },
                     use_quantiles=True,
                 ),
@@ -55,8 +51,8 @@ config = dict(
                     enable_depth_img=False,
                 ),
                 prompt_cfg=dict(
-                    tokenizer_model_path='google/paligemma-3b-pt-224',
-                    fast_tokenizer_path='physical-intelligence/fast',
+                    tokenizer_model_path='/home/giga/paligemma-3b-pt-224',
+                    fast_tokenizer_path='/home/giga/fast',
                     max_length=200,
                     # Can be change following sample_ratios according to your own data.
                     discrete_state_input=True,
@@ -78,7 +74,7 @@ config = dict(
         ),
     ),
     models=dict(
-        pretrained='open-gigaai/GigaBrain-0-3.5B-Base',
+        pretrained='/home/giga/GigaBrain-0-3.5B-Base',
         enable_knowledge_insulation=False,
         enable_learnable_traj_token=False,
         num_embodiments=3,
@@ -98,7 +94,7 @@ config = dict(
     ),
     train=dict(
         resume=True,
-        max_steps=50000,
+        max_steps=10,
         gradient_accumulation_steps=1,
         mixed_precision='no',  # Apply non-automatic mixed precision training.
         checkpoint_interval=1000,
@@ -107,9 +103,9 @@ config = dict(
         checkpoint_safe_serialization=False,
         checkpoint_strict=False,
         log_with='tensorboard',
-        log_interval=100,
+        log_interval=1,
         with_ema=True,
-        dynamo_config=dict(backend='inductor'),
+        #dynamo_config=dict(backend='inductor'),
         activation_checkpointing=True,
         activation_class_names=[
             'SiglipEncoderLayer',

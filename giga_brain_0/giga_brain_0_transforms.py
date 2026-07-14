@@ -1,5 +1,5 @@
 import json
-from enum import IntEnum, StrEnum
+from enum import IntEnum, Enum
 from typing import Any
 
 import torch
@@ -20,6 +20,11 @@ class EmbodimentId(IntEnum):
     AGILEX = 0
     AGIBOT_G1 = 1
     AGIBOT_WORLD = 2
+
+# 兼容 Python 3.10 的 StrEnum 实现
+class StrEnum(str, Enum):
+    def __str__(self) -> str:
+        return str(self.value)
 
 
 class RobotType(StrEnum):

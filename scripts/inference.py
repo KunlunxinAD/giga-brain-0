@@ -129,8 +129,10 @@ def visualize_result(gt_action: np.ndarray, pred_action: np.ndarray, out_path: s
 
     colors = plt.cm.viridis(np.linspace(0, 1, num_dim))
 
-    if action_names is None or len(action_names) == 0:
+    if action_names is None:
         action_names = [str(i) for i in range(num_dim)]
+    elif isinstance(action_names, dict):
+        action_names = [action_names.get(str(i), action_names.get(i, str(i))) for i in range(num_dim)]
 
     dim_list = range(num_dim)
     for ax_idx, dim_idx in enumerate(dim_list):
