@@ -1,6 +1,8 @@
+import os
+
 action_chunk = 50
 data_paths = [
-    '/home/giga/aloha_mobile_wipe_wine',
+    os.getenv('KUNLITA_DATASET_PATH', '/home/giga/aloha_mobile_wipe_wine'),
 ]
 data_or_config = []
 for data_path in data_paths:
@@ -16,9 +18,9 @@ for data_path in data_paths:
     )
 config = dict(
     runners=['giga_brain_0.GigaBrain0Trainer'],
-    project_dir='./experiments/vla/giga_brain_0_agilex/finetune_debug',
+    project_dir=os.path.join(os.environ['KUNLITA_OUTPUT_ROOT'], 'finetune') if os.getenv('KUNLITA_OUTPUT_ROOT') else './experiments/vla/giga_brain_0_agilex/finetune_debug',
     launch=dict(
-        gpu_ids=[0,1,2,3,4,5,6,7],
+        gpu_ids=[int(i) for i in os.getenv('CUDA_VISIBLE_DEVICES', '0,1,2,3,4,5,6,7').split(',')],
         distributed_type='DEEPSPEED',
         deepspeed_config=dict(
             deepspeed_config_file='accelerate_configs/zero2.json',
@@ -40,7 +42,7 @@ config = dict(
                 ),
                 norm_cfg=dict(
                     norm_stats_path={
-                        '0': '/home/giga/aloha_mobile_wipe_wine/norm_stats.json',
+                        '0': os.getenv('KUNLITA_NORM_STATS_PATH', '/home/giga/aloha_mobile_wipe_wine/norm_stats.json'),
                     },
                     use_quantiles=True,
                 ),
@@ -51,8 +53,8 @@ config = dict(
                     enable_depth_img=False,
                 ),
                 prompt_cfg=dict(
-                    tokenizer_model_path='/home/giga/paligemma-3b-pt-224',
-                    fast_tokenizer_path='/home/giga/fast',
+                    tokenizer_model_path=os.getenv('TOKENIZER_MODEL_PATH', '/home/giga/paligemma-3b-pt-224'),
+                    fast_tokenizer_path=os.getenv('FAST_TOKENIZER_PATH', '/home/giga/fast'),
                     max_length=200,
                     # Can be change following sample_ratios according to your own data.
                     discrete_state_input=True,
@@ -74,7 +76,7 @@ config = dict(
         ),
     ),
     models=dict(
-        pretrained='/home/giga/GigaBrain-0-3.5B-Base',
+        pretrained=os.getenv('KUNLITA_MODEL_PATH', '/home/giga/GigaBrain-0-3.5B-Base'),
         enable_knowledge_insulation=False,
         enable_learnable_traj_token=False,
         num_embodiments=3,
@@ -94,7 +96,7 @@ config = dict(
     ),
     train=dict(
         resume=True,
-        max_steps=10,
+        max_steps=int(os.getenv('GIGA_BRAIN_MAX_STEPS', '10')),
         gradient_accumulation_steps=1,
         mixed_precision='no',  # Apply non-automatic mixed precision training.
         checkpoint_interval=1000,
